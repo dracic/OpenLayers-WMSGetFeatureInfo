@@ -15,11 +15,11 @@
   <body>
     <!-- Map DOM element -->
 	<div id="ch2_wms_layer" style="width: 80%; height: 60%;"></div>
-	  
+    	  
 	<script type="text/javascript">
     <!-- The magic comes here -->
 	 
-	OpenLayers.ProxyHost = "/php/OpenLayers-WMSGetFeatureInfo/utils/proxy.php?url=";
+     OpenLayers.ProxyHost = "/php/OpenLayers-WMSGetFeatureInfo/utils/proxy.php?url=";
 
     // Create the map using the specified DOM element
     var map = new OpenLayers.Map("ch2_wms_layer");    
@@ -31,7 +31,7 @@
     });
 	
 	// Add borders WMS layer
-    var nexrad = new OpenLayers.Layer.WMS("Borders", "http://localhost:8080/geoserver/borders/wms",
+    var borders = new OpenLayers.Layer.WMS("Borders", "http://localhost:8080/geoserver/borders/wms",
     {
         layers: "borders:borders",
 		transparent: true,
@@ -43,33 +43,32 @@
     
     
     
-    map.addLayers([wms, nexrad]);
+    map.addLayers([wms, borders]);
     
     // Add layer switcher control
     map.addControl(new OpenLayers.Control.LayerSwitcher());
     // Set the center of the view
     map.setCenter(new OpenLayers.LonLat(16,45), 6);
 	
-	//feature info section
-	var featureInfo = new OpenLayers.Control.WMSGetFeatureInfo({
+	//feature id section
+	var idPicker = new OpenLayers.Control.WMSGetFeatureInfo({
         url: 'http://localhost:8080/geoserver/borders/wms', 
-        queryVisible: true,
-        eventListeners: {
-            "getfeatureinfo": function(event) {
-                map.addPopup(new OpenLayers.Popup.FramedCloud(
-                "chicken", 
-                map.getLonLatFromPixel(event.xy),
-                null,
-                event.text,
-                null,
-                true
-            ));
-            }
-        }
+        title: 'identify features on click',
+        layers: [borders],
+        queryVisible: true
     });
-    map.addControl(featureInfo);
-    
-    featureInfo.activate();
+
+    idPicker.infoFormat = 'application/vnd.ogc.gml';
+    idPicker.events.register("getfeatureinfo", this, pickId );
+    map.addControl(idPicker);
+    idPicker.activate();
+
+    function pickId(e) {
+        if (e.features && e.features.length) {
+            var val = e.features[0].attributes.id;
+            console.log(val);
+        }
+    }
     
     </script>
   </body>
