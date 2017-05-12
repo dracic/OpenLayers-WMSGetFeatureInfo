@@ -14,15 +14,21 @@
   </head>
   <body>
     <!-- Map DOM element -->
-	<div id="ch2_wms_layer" style="width: 80%; height: 60%;"></div>
-	  
+	<div id="mapdiv" style="width: 80%; height: 60%;"></div>
+    	  
 	<script type="text/javascript">
-    <!-- The magic comes here -->
+    //The magic comes here
 	 
-	OpenLayers.ProxyHost = "/php/OpenLayers-WMSGetFeatureInfo/utils/proxy.php?url=";
+     OpenLayers.ProxyHost = "/php/OpenLayers-WMSGetFeatureInfo/utils/proxy.php?url=";
 
     // Create the map using the specified DOM element
-    var map = new OpenLayers.Map("ch2_wms_layer");    
+    var map = new OpenLayers.Map("mapdiv");    
+
+    //blank vector layer for highlighting
+    var highlight_style = { fillColor:'#99CCFF', strokeColor:'#3399FF', fillOpacity:0.7 };
+    hilites = new OpenLayers.Layer.Vector("Highlighted",
+    {isBaseLayer:false, features:[], visibility:true, style:highlight_style}
+    );
     
     // Add a WMS layer
     var wms = new OpenLayers.Layer.WMS("Basic", "http://vmap0.tiles.osgeo.org/wms/vmap0",
@@ -31,7 +37,7 @@
     });
 	
 	// Add borders WMS layer
-    var nexrad = new OpenLayers.Layer.WMS("Borders", "http://localhost:8080/geoserver/borders/wms",
+    var borders = new OpenLayers.Layer.WMS("Borders", "http://localhost:8080/geoserver/borders/wms",
     {
         layers: "borders:borders",
 		transparent: true,
@@ -43,34 +49,44 @@
     
     
     
-    map.addLayers([wms, nexrad]);
+    map.addLayers([wms, borders, hilites]);
     
     // Add layer switcher control
     map.addControl(new OpenLayers.Control.LayerSwitcher());
     // Set the center of the view
     map.setCenter(new OpenLayers.LonLat(16,45), 6);
 	
-	//feature info section
-	var featureInfo = new OpenLayers.Control.WMSGetFeatureInfo({
-        url: 'http://localhost:8080/geoserver/borders/wms', 
-        queryVisible: true,
-        eventListeners: {
-            "getfeatureinfo": function(event) {
-                map.addPopup(new OpenLayers.Popup.FramedCloud(
-                "chicken", 
-                map.getLonLatFromPixel(event.xy),
-                null,
-                event.text,
-                null,
-                true
-            ));
-            }
-        }
+    //selection
+    map.events.register('click', map, function (e) {
+    var pixel = new OpenLayers.Pixel(e.xy.x,e.xy.y);
+    var lonlat = map.getLonLatFromPixel(pixel);
+    
+    OpenLayers.Request.GET({
+        url: "http://localhost:8080/geoserver/borders/wms",
+        params: {
+            SERVICE: "WMS",
+            VERSION: "1.3.0",
+            REQUEST: "GetFeature",
+        }, 
+        success: console.log(response), 
+        failure: console.log("failed")
     });
-    map.addControl(featureInfo);
     
-    featureInfo.activate();
-    
+
+    OpenLayers.Event.stop(e);
+    });
+
+
+    function highlight_them(response) {
+    // use the GML parser to turn the XML into a list of Feature objects
+    // have the Vector layer purge its feature list, replace them with the new ones
+    var features = new OpenLayers.Format.GML().read(response.responseText);
+    console.log(features);
+    hilites.destroyFeatures();
+    hilites.addFeatures(features);
+    hilites.setVisibility(true);
+    };
+
     </script>
   </body>
 </html>
