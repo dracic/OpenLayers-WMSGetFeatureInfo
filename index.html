@@ -65,7 +65,7 @@
         url: "http://localhost:8080/geoserver/borders/wms",
         params: {
             SERVICE: "WMS",
-            VERSION: "1.1.1"
+            VERSION: "1.1.1",
             REQUEST: "GetFeatureInfo",
             EXCEPTIONS: "application/vnd.ogc.se_xml",
             BBOX: map.getExtent().toBBOX(),
@@ -80,7 +80,7 @@
             WIDTH: map.size.w,
             HEIGHT: map.size.h
         }, 
-        success: console.log(response), 
+        success: console.log(this.responseText), 
         failure: console.log("failed")
     });
     
