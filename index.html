@@ -84,11 +84,11 @@
             WIDTH: map.size.w,
             HEIGHT: map.size.h
         }, 
-        success: highlight_them, 
-        failure: highlight_them
+        success: console.log('success'), 
+        failure: console.log('failed')
     });
 	
-	//console.log(request);
+	console.log(request);
     
 
     OpenLayers.Event.stop(e);
