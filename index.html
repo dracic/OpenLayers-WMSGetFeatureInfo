@@ -26,7 +26,7 @@
 
     //blank vector layer for highlighting
     var highlight_style = { fillColor:'#99CCFF', strokeColor:'#3399FF', fillOpacity:0.7 };
-    hilites = new OpenLayers.Layer.Vector("Highlighted",
+    var hilites = new OpenLayers.Layer.Vector("Highlighted",
     {isBaseLayer:false, features:[], visibility:true, style:highlight_style}
     );
     
@@ -88,9 +88,8 @@
         failure: highlight_them
     });
 	
-	//console.log(request);
-    
-
+    //console.log(request);
+         
     OpenLayers.Event.stop(e);
     });
 
@@ -100,7 +99,7 @@
     // have the Vector layer purge its feature list, replace them with the new ones
     var features = new OpenLayers.Format.GML().read(request.responseText);
     console.log(features);
-    hilites.destroyFeatures();
+    //hilites.destroyFeatures();
     hilites.addFeatures(features);
     hilites.setVisibility(true);
     };
