@@ -5,8 +5,8 @@
     <meta http-equiv="Content-Type"
       content="text/html; charset=UTF-8">
 
-    <script type="text/javascript" src="./js/OpenLayers-2.12/OpenLayers.js"></script>
-    <link rel="stylesheet" href="./js/OpenLayers-2.12/theme/default/style.css" type="text/css">
+    <script type="text/javascript" src="./js/OpenLayers-2.13.1/OpenLayers.js"></script>
+    <link rel="stylesheet" href="./js/OpenLayers-2.13.1/theme/default/style.css" type="text/css">
 	
 	<link rel="stylesheet" type="text/css" href="./css/cookbook.css"> 
     
@@ -26,7 +26,7 @@
 
     //blank vector layer for highlighting
     var highlight_style = { fillColor:'#99CCFF', strokeColor:'#3399FF', fillOpacity:0.7 };
-    hilites = new OpenLayers.Layer.Vector("Highlighted",
+    var hilites = new OpenLayers.Layer.Vector("Highlighted",
     {isBaseLayer:false, features:[], visibility:true, style:highlight_style}
     );
     
@@ -55,11 +55,15 @@
     map.addControl(new OpenLayers.Control.LayerSwitcher());
     // Set the center of the view
     map.setCenter(new OpenLayers.LonLat(16,45), 6);
-	
+
     //selection
     map.events.register('click', map, function (e) {
     var pixel = new OpenLayers.Pixel(e.xy.x,e.xy.y);
+	//console.log(pixel);
     var lonlat = map.getLonLatFromPixel(pixel);
+	//console.log(lonlat);
+	//var extent = map.getExtent().toBBOX();
+	//console.log(extent);
     
     OpenLayers.Request.GET({
         url: "http://localhost:8080/geoserver/borders/wms",
@@ -80,24 +84,29 @@
             WIDTH: map.size.w,
             HEIGHT: map.size.h
         }, 
-        success: console.log(this.responseText), 
-        failure: console.log("failed")
+        success: highlight_them, 
+        failure: highlight_them
     });
-    
-
+	
+    //console.log(request);
+         
     OpenLayers.Event.stop(e);
     });
 
 
-    function highlight_them(response) {
-    // use the GML parser to turn the XML into a list of Feature objects
-    // have the Vector layer purge its feature list, replace them with the new ones
-    var features = new OpenLayers.Format.GML().read(response.responseText);
-    console.log(features);
-    hilites.destroyFeatures();
-    hilites.addFeatures(features);
-    hilites.setVisibility(true);
-    };
+    function highlight_them(request) {
+        // use the GML parser to turn the XML into a list of Feature objects
+        // have the Vector layer purge its feature list, replace them with the new ones
+        //console.log(request.responseText)
+        var features = new OpenLayers.Format.GML().read(request.responseText);
+        console.log(features);
+        //hilites.destroyFeatures();
+        map.layers[2].addFeatures(features);
+        //map.layers[2].redraw();
+        map.layers[2].refresh({force:true});
+        map.layers[2].setVisibility(true);
+        
+        };
 
     </script>
   </body>
