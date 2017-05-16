@@ -97,10 +97,12 @@
     function highlight_them(request) {
     // use the GML parser to turn the XML into a list of Feature objects
     // have the Vector layer purge its feature list, replace them with the new ones
-    var features = new OpenLayers.Format.GML().read(request.responseText);
+    console.log(request.responseText)
+    var features = new OpenLayers.Format.GML.v2().read(request.responseText);
     console.log(features);
     //hilites.destroyFeatures();
     hilites.addFeatures(features);
+    //hilites.redraw();
     hilites.refresh({force:true});
     hilites.setVisibility(true);
     };
