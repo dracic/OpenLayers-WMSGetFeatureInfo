@@ -56,17 +56,6 @@
     // Set the center of the view
     map.setCenter(new OpenLayers.LonLat(16,45), 6);
 
-    //gml options for correct parsing
-    var gmlOptions = {
-        featureType: "borders",
-        featureNS: "http://localhost:8080/geoserver/borders"
-    };
-    var gmlOptionsIn = OpenLayers.Util.extend(
-        OpenLayers.Util.extend({}, gmlOptions)
-    );
-    var formatGml = new OpenLayers.Format.GML.v2(gmlOptionsIn);
-
-	
     //selection
     map.events.register('click', map, function (e) {
     var pixel = new OpenLayers.Pixel(e.xy.x,e.xy.y);
@@ -109,13 +98,14 @@
         // use the GML parser to turn the XML into a list of Feature objects
         // have the Vector layer purge its feature list, replace them with the new ones
         //console.log(request.responseText)
-        var features = formatGml.read(request.responseText);
+        var features = new OpenLayers.Format.GML().read(request.responseText);
         console.log(features);
         //hilites.destroyFeatures();
-        hilites.addFeatures(features);
-        //hilites.redraw();
-        hilites.refresh({force:true});
-        hilites.setVisibility(true);
+        map.layers[2].addFeatures(features);
+        //map.layers[2].redraw();
+        map.layers[2].refresh({force:true});
+        map.layers[2].setVisibility(true);
+        
         };
 
     </script>
