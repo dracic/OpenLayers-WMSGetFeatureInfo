@@ -101,7 +101,7 @@
         var features = new OpenLayers.Format.GML().read(request.responseText);
         console.log(features);
 
-
+        hilites.destroyFeatures();
         hilites.addFeatures(features);
 
         //map.layers[2].redraw();
