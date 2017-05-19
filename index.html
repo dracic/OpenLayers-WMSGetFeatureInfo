@@ -17,9 +17,11 @@
 	<div id="mapdiv" style="width: 80%; height: 60%;"></div>
 
 	<script type="text/javascript">
-    //The magic comes here
-
+     //proxy
      OpenLayers.ProxyHost = "/php/OpenLayers-WMSGetFeatureInfo/utils/proxy.php?url=";
+
+     //id of selected feature
+     var featureId;
 
     // Create the map using the specified DOM element
     var map = new OpenLayers.Map("mapdiv");
@@ -36,7 +38,7 @@
         layers: 'basic'
     });
 
-	// Add borders WMS layer
+	  // Add borders WMS layer
     var borders = new OpenLayers.Layer.WMS("Borders", "http://localhost:8080/geoserver/borders/wms",
     {
         layers: "borders:borders",
@@ -48,7 +50,7 @@
     });
 
 
-
+    //add layers to map
     map.addLayers([wms, borders, hilites]);
 
     // Add layer switcher control
@@ -91,9 +93,17 @@
     function highlight_them(request) {
         // use the GML parser to turn the XML into a list of Feature objects
         // have the Vector layer purge its feature list, replace them with the new ones
-        console.log(request.responseText)
+        //console.log(request.responseText)
         var features = new OpenLayers.Format.GML().read(request.responseText);
-        console.log(features);
+        //console.log(features);
+
+        if (typeof features[0] !== 'undefined') {
+          featureId = features[0].attributes.gid;
+          console.log(featureId);
+        } else {
+          featureId = undefined;
+        }
+
 
         //destroy existing feature (unselect) and draw a new one
         hilites.destroyFeatures();
