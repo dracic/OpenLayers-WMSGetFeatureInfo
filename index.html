@@ -16,6 +16,9 @@
     <!-- Map DOM element -->
 	<div id="mapdiv" style="width: 80%; height: 60%;"></div>
 
+  <button onclick="unselect()">Unselect</button>
+  
+
 	<script type="text/javascript">
      //proxy
      OpenLayers.ProxyHost = "/php/OpenLayers-WMSGetFeatureInfo/utils/proxy.php?url=";
@@ -109,6 +112,11 @@
         hilites.destroyFeatures();
         hilites.addFeatures(features);
         };
+
+   function unselect(){
+     hilites.destroyFeatures();
+     featureId = undefined;
+   };
 
     </script>
   </body>
