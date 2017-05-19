@@ -4,7 +4,7 @@
     <title>WMS getfeatureinfo</title>
     <meta http-equiv="Content-Type"
       content="text/html; charset=UTF-8">
-
+    <script type="text/javascript" src="ajax_post.js"></script> 
     <script type="text/javascript" src="./js/OpenLayers-2.13.1/OpenLayers.js"></script>
     <link rel="stylesheet" href="./js/OpenLayers-2.13.1/theme/default/style.css" type="text/css">
 
@@ -17,7 +17,9 @@
 	<div id="mapdiv" style="width: 80%; height: 60%;"></div>
 
   <button onclick="unselect()">Unselect</button>
-  <button>Processed</button>
+  <input name="myBtn" type="submit" value="Submit Data" onClick="javascript:ajax_post()"></input>
+  <br /><br />
+  <div id="status"></div>
 
 	<script type="text/javascript">
      //proxy
