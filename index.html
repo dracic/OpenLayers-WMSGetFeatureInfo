@@ -59,11 +59,7 @@
     //selection
     map.events.register('click', map, function (e) {
     var pixel = new OpenLayers.Pixel(e.xy.x,e.xy.y);
-	//console.log(pixel);
     var lonlat = map.getLonLatFromPixel(pixel);
-	//console.log(lonlat);
-	//var extent = map.getExtent().toBBOX();
-	//console.log(extent);
 
     OpenLayers.Request.GET({
         url: "http://localhost:8080/geoserver/borders/wms",
@@ -88,8 +84,6 @@
         failure: highlight_them
     });
 
-    //console.log(request);
-
     OpenLayers.Event.stop(e);
     });
 
@@ -101,17 +95,9 @@
         var features = new OpenLayers.Format.GML().read(request.responseText);
         console.log(features);
 
+        //destroy existing feature (unselect) and draw a new one
         hilites.destroyFeatures();
         hilites.addFeatures(features);
-
-        //map.layers[2].redraw();
-        //map.layers[2].refresh({force:true});
-        //hilites.destroyFeatures();
-        //map.layers[2].addFeatures(features);
-        //map.layers[2].redraw();
-        //map.layers[2].refresh({force:true});
-        //map.layers[2].setVisibility(true);
-
         };
 
     </script>
