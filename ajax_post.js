@@ -1,4 +1,5 @@
 function ajax_post(){
+  if (typeof featureId !== 'undefined') {
     // Create our XMLHttpRequest object
     var hr = new XMLHttpRequest();
     // Create some variables we need to send to our PHP file
@@ -18,4 +19,8 @@ function ajax_post(){
     // Send the data to PHP now... and wait for response to update the status div
     hr.send(vars); // Actually execute the request
     document.getElementById("status").innerHTML = "processing...";
+  }
+  else {
+    window.alert("Select polygon first");
+  }
 }
