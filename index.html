@@ -17,12 +17,16 @@
 
   </head>
   <body>
-    <!-- Map DOM element -->
+  <!-- Map DOM element -->
 	<div id="mapdiv" style="width: 80%; height: 60%;"></div>
 
+  <!--Button for unselecting polygon-->
   <button onclick="unselect()">Unselect</button>
+  <!--Button for changing value to processed-->
   <input name="myBtn" type="submit" value="Processed" onClick="ajax_post1()"></input>
+  <!--Button for changing value to unprocessed-->
   <input name="myBtn2" type="submit" value="Not processed" onClick="ajax_post2()"></input>
+  <!--Button for redrawing WMS layer with polygons (for debugging)-->
   <input name="myBtn3" type="submit" value="Redraw" onClick="redrawWMS()"></input>
   <br /><br />
   <div id="status"></div>
@@ -43,7 +47,7 @@
     {isBaseLayer:false, visibility:true, style:highlight_style}
     );
 
-    // Add a WMS layer
+    // Add background WMS layer
     var wms = new OpenLayers.Layer.WMS("Basic", "http://vmap0.tiles.osgeo.org/wms/vmap0",
     {
         layers: 'basic'
@@ -122,11 +126,14 @@
         hilites.addFeatures(features);
         };
 
+   //function called with "unselect" button
    function unselect(){
      hilites.destroyFeatures();
      featureId = undefined;
    };
 
+   //AJAX requests that post data to php script
+   //featureId is in $_POST array ($_POST['idd'])
    function ajax_post1() {
      if (typeof featureId !== 'undefined') {
        $.post('parse_file.php', {idd: featureId}).done(function(){
@@ -143,6 +150,7 @@
      }
    }
 
+   //function for redrawing WMS layer
    function redrawWMS(){
      featureId = undefined;
      hilites.destroyFeatures();
