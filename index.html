@@ -5,72 +5,158 @@
     <meta http-equiv="Content-Type"
       content="text/html; charset=UTF-8">
 
-    <script type="text/javascript" src="./js/OpenLayers-2.12/OpenLayers.js"></script>
-    <link rel="stylesheet" href="./js/OpenLayers-2.12/theme/default/style.css" type="text/css">
-	
-	<link rel="stylesheet" type="text/css" href="./css/cookbook.css"> 
-    
+    <script type="text/javascript" src="./js/OpenLayers-2.13.1/OpenLayers.js"></script>
+    <script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="./js/OpenLayers-2.13.1/theme/default/style.css" type="text/css">
+
+	<link rel="stylesheet" type="text/css" href="./css/cookbook.css">
+
 
   </head>
   <body>
-    <!-- Map DOM element -->
-	<div id="ch2_wms_layer" style="width: 80%; height: 60%;"></div>
-	  
+  <!-- Map DOM element -->
+	<div id="mapdiv" style="width: 80%; height: 60%;"></div>
+
+  <!--Button for unselecting polygon-->
+  <button onclick="unselect()">Unselect</button>
+  <!--Button for changing value to processed-->
+  <input name="myBtn" type="submit" value="Processed" onClick="ajax_post1()"></input>
+  <!--Button for changing value to unprocessed-->
+  <input name="myBtn2" type="submit" value="Not processed" onClick="ajax_post2()"></input>
+  <!--Button for redrawing WMS layer with polygons (for debugging)-->
+  <input name="myBtn3" type="submit" value="Redraw" onClick="redrawWMS()"></input>
+  <br /><br />
+  <div id="status"></div>
+
 	<script type="text/javascript">
-    <!-- The magic comes here -->
-	 
-	OpenLayers.ProxyHost = "/php/OpenLayers-WMSGetFeatureInfo/utils/proxy.php?url=";
+     //proxy
+     OpenLayers.ProxyHost = "/php/OpenLayers-WMSGetFeatureInfo/utils/proxy.php?url=";
+
+     //id of selected feature
+     var featureId;
 
     // Create the map using the specified DOM element
-    var map = new OpenLayers.Map("ch2_wms_layer");    
-    
-    // Add a WMS layer
+    var map = new OpenLayers.Map("mapdiv");
+
+    //blank vector layer for highlighting
+    var highlight_style = { fillColor:'#99CCFF', strokeColor:'#3399FF', fillOpacity:0.7 };
+    var hilites = new OpenLayers.Layer.Vector("Highlighted",
+    {isBaseLayer:false, visibility:true, style:highlight_style}
+    );
+
+    // Add background WMS layer
     var wms = new OpenLayers.Layer.WMS("Basic", "http://vmap0.tiles.osgeo.org/wms/vmap0",
     {
         layers: 'basic'
     });
-	
-	// Add borders WMS layer
-    var nexrad = new OpenLayers.Layer.WMS("Borders", "http://localhost:8080/geoserver/borders/wms",
+
+	  // Add borders WMS layer
+    var borders = new OpenLayers.Layer.WMS("Borders", "http://localhost:8080/geoserver/borders/wms",
     {
         layers: "borders:borders",
-		transparent: true,
+		    transparent: true,
         format: 'image/png'
     },
+    {singleTile: true, ratio: 1},
     {
        isBaseLayer: false
     });
-    
-    
-    
-    map.addLayers([wms, nexrad]);
-    
+
+
+    //add layers to map
+    map.addLayers([wms, borders, hilites]);
+
     // Add layer switcher control
     map.addControl(new OpenLayers.Control.LayerSwitcher());
     // Set the center of the view
     map.setCenter(new OpenLayers.LonLat(16,45), 6);
-	
-	//feature info section
-	var featureInfo = new OpenLayers.Control.WMSGetFeatureInfo({
-        url: 'http://localhost:8080/geoserver/borders/wms', 
-        queryVisible: true,
-        eventListeners: {
-            "getfeatureinfo": function(event) {
-                map.addPopup(new OpenLayers.Popup.FramedCloud(
-                "chicken", 
-                map.getLonLatFromPixel(event.xy),
-                null,
-                event.text,
-                null,
-                true
-            ));
-            }
-        }
+
+    //selection
+    map.events.register('click', map, function (e) {
+    var pixel = new OpenLayers.Pixel(e.xy.x,e.xy.y);
+    var lonlat = map.getLonLatFromPixel(pixel);
+
+    OpenLayers.Request.GET({
+        url: "http://localhost:8080/geoserver/borders/wms",
+        params: {
+            SERVICE: "WMS",
+            VERSION: "1.1.1",
+            REQUEST: "GetFeatureInfo",
+            EXCEPTIONS: "application/vnd.ogc.se_xml",
+            BBOX: map.getExtent().toBBOX(),
+            X: e.xy.x,
+            Y: e.xy.y,
+            INFO_FORMAT: 'application/vnd.ogc.gml',
+            QUERY_LAYERS: 'borders:borders',
+            FEATURE_COUNT: 50,
+            Layers: 'borders:borders',
+            Styles: '',
+            Srs: 'EPSG:4326',
+            WIDTH: map.size.w,
+            HEIGHT: map.size.h
+        },
+        success: highlight_them,
+        failure: highlight_them
     });
-    map.addControl(featureInfo);
-    
-    featureInfo.activate();
-    
+
+    OpenLayers.Event.stop(e);
+    });
+
+
+    function highlight_them(request) {
+        // use the GML parser to turn the XML into a list of Feature objects
+        // have the Vector layer purge its feature list, replace them with the new ones
+        //console.log(request.responseText)
+        var features = new OpenLayers.Format.GML().read(request.responseText);
+        //console.log(features);
+
+        if (typeof features[0] !== 'undefined') {
+          featureId = features[0].attributes.gid;
+          console.log(featureId);
+        } else {
+          featureId = undefined;
+        }
+
+
+        //destroy existing feature (unselect) and draw a new one
+        hilites.destroyFeatures();
+        hilites.addFeatures(features);
+        };
+
+   //function called with "unselect" button
+   function unselect(){
+     hilites.destroyFeatures();
+     featureId = undefined;
+   };
+
+   //AJAX requests that post data to php script
+   //featureId is in $_POST array ($_POST['idd'])
+   function ajax_post1() {
+     if (typeof featureId !== 'undefined') {
+       $.post('parse_file.php', {idd: featureId}).done(function(){
+         redrawWMS();
+       });
+     }
+   }
+
+   function ajax_post2() {
+     if (typeof featureId !== 'undefined') {
+       $.post('parse_file2.php', {idd: featureId}).done(function(){
+         redrawWMS();
+       });
+     }
+   }
+
+   //function for redrawing WMS layer
+   function redrawWMS(){
+     featureId = undefined;
+     hilites.destroyFeatures();
+     borders.redraw({force:true});
+   };
+
     </script>
   </body>
 </html>
