@@ -4,7 +4,7 @@ $dbconn = pg_connect("host=localhost dbname=borders user=admin password=admin")
   or die('Could not connect: ' . pg_last_error());
 
 
-$featureID = $_POST['featureId'];
+$featureID = $_POST['idd'];
 
 //Performing SQL query
 $query = "UPDATE borders SET processed = 1 WHERE borders.gid =".$featureID;

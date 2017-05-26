@@ -4,8 +4,12 @@
     <title>WMS getfeatureinfo</title>
     <meta http-equiv="Content-Type"
       content="text/html; charset=UTF-8">
-    <script type="text/javascript" src="ajax_post.js"></script>
+
     <script type="text/javascript" src="./js/OpenLayers-2.13.1/OpenLayers.js"></script>
+    <script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
     <link rel="stylesheet" href="./js/OpenLayers-2.13.1/theme/default/style.css" type="text/css">
 
 	<link rel="stylesheet" type="text/css" href="./css/cookbook.css">
@@ -17,8 +21,8 @@
 	<div id="mapdiv" style="width: 80%; height: 60%;"></div>
 
   <button onclick="unselect()">Unselect</button>
-  <input name="myBtn" type="submit" value="Processed" onClick="javascript:ajax_post()"></input>
-  <input name="myBtn2" type="submit" value="Not processed" onClick="javascript:ajax_post2()"></input>
+  <input name="myBtn" type="submit" value="Processed" onClick="ajax_post1()"></input>
+  <input name="myBtn2" type="submit" value="Not processed" onClick="ajax_post2()"></input>
   <input name="myBtn3" type="submit" value="Redraw" onClick="redrawWMS()"></input>
   <br /><br />
   <div id="status"></div>
@@ -123,7 +127,25 @@
      featureId = undefined;
    };
 
+   function ajax_post1() {
+     if (typeof featureId !== 'undefined') {
+       $.post('parse_file.php', {idd: featureId}).done(function(){
+         redrawWMS();
+       });
+     }
+   }
+
+   function ajax_post2() {
+     if (typeof featureId !== 'undefined') {
+       $.post('parse_file2.php', {idd: featureId}).done(function(){
+         redrawWMS();
+       });
+     }
+   }
+
    function redrawWMS(){
+     featureId = undefined;
+     hilites.destroyFeatures();
      borders.redraw({force:true});
    };
 
