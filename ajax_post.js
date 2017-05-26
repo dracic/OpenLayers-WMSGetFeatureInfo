@@ -19,6 +19,8 @@ function ajax_post(){
     // Send the data to PHP now... and wait for response to update the status div
     hr.send(vars); // Actually execute the request
     document.getElementById("status").innerHTML = "processing...";
+    hilites.destroyFeatures();
+    featureId = undefined;
   }
   else {
     window.alert("Select polygon first");
@@ -46,6 +48,8 @@ function ajax_post2(){
     // Send the data to PHP now... and wait for response to update the status div
     hr.send(vars); // Actually execute the request
     document.getElementById("status").innerHTML = "processing...";
+    hilites.destroyFeatures();
+    featureId = undefined;
   }
   else {
     window.alert("Select polygon first");

@@ -19,6 +19,7 @@
   <button onclick="unselect()">Unselect</button>
   <input name="myBtn" type="submit" value="Processed" onClick="javascript:ajax_post()"></input>
   <input name="myBtn2" type="submit" value="Not processed" onClick="javascript:ajax_post2()"></input>
+  <input name="myBtn3" type="submit" value="Redraw" onClick="redrawWMS()"></input>
   <br /><br />
   <div id="status"></div>
 
@@ -48,9 +49,10 @@
     var borders = new OpenLayers.Layer.WMS("Borders", "http://localhost:8080/geoserver/borders/wms",
     {
         layers: "borders:borders",
-		transparent: true,
+		    transparent: true,
         format: 'image/png'
     },
+    {singleTile: true, ratio: 1},
     {
        isBaseLayer: false
     });
@@ -119,6 +121,10 @@
    function unselect(){
      hilites.destroyFeatures();
      featureId = undefined;
+   };
+
+   function redrawWMS(){
+     borders.redraw({force:true});
    };
 
     </script>
