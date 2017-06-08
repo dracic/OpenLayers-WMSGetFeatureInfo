@@ -53,10 +53,10 @@
         layers: 'basic'
     });
 
-	  // Add borders WMS layer
-    var borders = new OpenLayers.Layer.WMS("Borders", "http://localhost:8080/geoserver/borders/wms",
+	  // Add tk25gridQC WMS layer
+    var borders = new OpenLayers.Layer.WMS("Borders", "http://localhost:8080/geoserver/tk25gridQC/wms",
     {
-        layers: "borders:borders",
+        layers: "tk25gridQC:tk25_grid_qc",
 		    transparent: true,
         format: 'image/png'
     },
@@ -80,7 +80,7 @@
     var lonlat = map.getLonLatFromPixel(pixel);
 
     OpenLayers.Request.GET({
-        url: "http://localhost:8080/geoserver/borders/wms",
+        url: "http://localhost:8080/geoserver/tk25gridQC/wms",
         params: {
             SERVICE: "WMS",
             VERSION: "1.1.1",
@@ -90,9 +90,9 @@
             X: e.xy.x,
             Y: e.xy.y,
             INFO_FORMAT: 'application/vnd.ogc.gml',
-            QUERY_LAYERS: 'borders:borders',
-            FEATURE_COUNT: 50,
-            Layers: 'borders:borders',
+            QUERY_LAYERS: 'tk25gridQC:tk25_grid_qc',
+            FEATURE_COUNT: 1,
+            Layers: 'tk25gridQC:tk25_grid_qc',
             Styles: '',
             Srs: 'EPSG:4326',
             WIDTH: map.size.w,
