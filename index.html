@@ -55,7 +55,13 @@
       units: 'm',
       projection: 'EPSG:3765',
       scales: [5000000, 2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2500, 1000 /*, 500*/ ],
-      center: '498764,4928939'
+      maxExtent: '250515, 4694487, 747013, 5163391',
+      center: '498764,4928939',
+      xy_precision: 3,
+      zoom: 0,
+      theme: null,
+      transitionEffect: 'resize',
+      tileManager: null
     });
 
     //blank vector layer for highlighting
@@ -67,7 +73,13 @@
     // Add background WMS layer
     var wms = new OpenLayers.Layer.WMS("Basic", " http://geoportal.dgu.hr/services/dof/wms",
     {
-        projection: 'EPSG:3765'
+        layers: "DOF5_2011",
+        format: "image/jpeg",
+        transparent: false,
+        version: '1.1.1'
+    }, {
+        singleTile: false,
+        isBaseLayer: true
     });
 
 	  // Add tk25gridQC WMS layer
