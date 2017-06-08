@@ -53,10 +53,9 @@
     var map = new OpenLayers.Map({
       div: "mapdiv",
       units: 'm',
-      projection: 'EPSG:3756',
+      projection: 'EPSG:3765',
       scales: [5000000, 2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2500, 1000 /*, 500*/ ],
-
-
+      center: '498764,4928939'
     });
 
     //blank vector layer for highlighting
@@ -66,9 +65,9 @@
     );
 
     // Add background WMS layer
-    var wms = new OpenLayers.Layer.WMS("Basic", "http://vmap0.tiles.osgeo.org/wms/vmap0",
+    var wms = new OpenLayers.Layer.WMS("Basic", " http://geoportal.dgu.hr/services/dof/wms",
     {
-        layers: 'basic'
+        projection: 'EPSG:3765'
     });
 
 	  // Add tk25gridQC WMS layer
@@ -85,12 +84,12 @@
 
 
     //add layers to map
-    map.addLayers([wms, borders, hilites]);
+    map.addLayer(wms);
 
     // Add layer switcher control
     map.addControl(new OpenLayers.Control.LayerSwitcher());
     // Set the center of the view
-    map.setCenter(new OpenLayers.LonLat(16,45), 6);
+    //map.setCenter(new OpenLayers.LonLat(16,45), 6);
 
     //selection
     map.events.register('click', map, function (e) {
