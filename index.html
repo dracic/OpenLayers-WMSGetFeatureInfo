@@ -50,7 +50,14 @@
      var featureId;
 
     // Create the map using the specified DOM element
-    var map = new OpenLayers.Map("mapdiv");
+    var map = new OpenLayers.Map({
+      div: "mapdiv",
+      units: 'm',
+      projection: 'EPSG:3756',
+      scales: [5000000, 2500000, 1000000, 500000, 250000, 100000, 50000, 25000, 10000, 5000, 2500, 1000 /*, 500*/ ],
+
+
+    });
 
     //blank vector layer for highlighting
     var highlight_style = { fillColor:'#99CCFF', strokeColor:'#3399FF', fillOpacity:0.7 };
